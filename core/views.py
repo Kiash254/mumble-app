@@ -97,6 +97,19 @@ def room(request,pk):
     }
 
     return render(request, 'core/room.html',context)
+
+def Profile(request , pk):
+    user=User.objects.get(id=pk)
+    rooms=user.room_set.all()
+    room_message=user.message_set.all()
+    topics=Topic.objects.all()
+    context={
+        'user':user,
+        'rooms':rooms,
+        'room_message':room_message,
+        'topics':topics,
+    }
+    return render(request,'core/profile.html', context)
 #CRUD
 @login_required(login_url='core:login')
 def CreateView(request):
@@ -104,7 +117,9 @@ def CreateView(request):
     if request.method=='POST':
         form=RoomForm(request.POST)
         if form.is_valid():
-            form.save()
+            room=form.save(commit=False)
+            room.host=request.user
+            room.save()
             return redirect('core:home')
     context={
         'form':form
