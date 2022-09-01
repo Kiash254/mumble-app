@@ -2,8 +2,35 @@ from django.shortcuts import render,redirect
 from .models import Room,Message,Topic
 from .forms import RoomForm
 from django.db.models import Q
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import authenticate,login,logout
 
 # Create your views here.
+
+
+def LoginPage(request):
+    if request.method=='POST':
+        username=request.POST.get('username')
+        password=request.POST.get('password')
+        try:
+            user=User.objects.get(username=username)
+        except:
+            messages.error(request,'Username is not found')
+        user=authenticate(request, username=username,password=password)
+
+        if user is not None:
+            login(request,user)
+            return redirect('core:home')
+        else:
+            messages.error(request,'Invalid username or password')
+
+    context={}
+    return render(request,'core/login_register.html',context)
+
+def LogoutPage(request):
+    logout(request)
+    return redirect('core:login')
 
 def home(request):
     q=request.GET.get('q') if request.GET.get('q') else ''

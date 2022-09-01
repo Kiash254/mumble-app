@@ -3,4 +3,10 @@
 <form action="{%url 'core:home' %}" method="GET">
     <input type="text" name="q" id="" placeholder="Serach Room .....">
 </form>
+
+{% if request.user.is_authenticated  %}
+    <a href="{% url 'core:logout' %}">Logout</a>
+{% else %}
+    <a href="{% url 'core:login' %}">Login</a>
+{% endif %}
 <hr>
