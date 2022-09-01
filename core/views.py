@@ -59,7 +59,6 @@ def RegisterPage(request):
 
 def home(request):
     q=request.GET.get('q') if request.GET.get('q') else ''
-    
     rooms=Room.objects.filter(
         Q(topic__name__icontains=q) |
         Q(name__icontains=q) |
@@ -68,17 +67,19 @@ def home(request):
     ) 
     topics=Topic.objects.all()
     room_count=rooms.count()
+    room_message=Message.objects.filter(Q(room__topic__name__icontains=q)) 
     context={
         'rooms':rooms,
         'topics':topics,
         'room_count':room_count,
+        'room_message':room_message,
     }
     return render(request,'core/home.html',context)
 
 def room(request,pk):
    
     room=Room.objects.get(id=pk)
-    room_message=room.message_set.all().order_by('-created')
+    room_message=room.message_set.all()
     participants=room.participants.all()
     if request.method=='POST':
         message=Message.objects.create(
@@ -148,6 +149,6 @@ def Deletemessage(request,pk):
         message.delete()
         return redirect('core:home')
     context={
-        'room':room
+        'message':message
     }
     return render(request,'core/delete.html',context)

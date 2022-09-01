@@ -20,13 +20,13 @@
         <div class="comment-wrapper">
             <h3>Conversations</h3>
             <hr>
-            {% for msg in room_message %}
+            {% for message in room_message %}
             <div>
-                {%  if request.user == message.user %}
+                {%  if request.user == massage.user %}
                 <a href="{% url  'core:delete-massage' message.id %}">Delete</a>
                 {% endif %} 
-               <small>@{{msg.user}} ---- {{msg.created|timesince}} ago </small>
-                 <p>{{msg.content}}</p>
+               <small>@{{message.user}} ---- {{message.created|timesince}} ago </small>
+                 <p>{{message.content}}</p>
             </div>
             {% endfor %}
         </div>
