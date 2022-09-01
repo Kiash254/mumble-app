@@ -4,9 +4,9 @@ from django.shortcuts import render
 
 def home(request):
     context={}
-    return render(request,'home.html',context)
+    return render(request,'core/home.html',context)
 
 def room(request):
     context={}
 
-    return render(request, 'room.html',context)
+    return render(request, 'core/room.html',context)
