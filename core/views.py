@@ -5,13 +5,18 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
-
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.contrib.auth.forms import UserCreationForm
 # Create your views here.
 
 
 def LoginPage(request):
+    page='login'
+    if request.user.is_authenticated:
+        return redirect('core:home')    
     if request.method=='POST':
-        username=request.POST.get('username')
+        username=request.POST.get('username').lower()
         password=request.POST.get('password')
         try:
             user=User.objects.get(username=username)
@@ -25,12 +30,32 @@ def LoginPage(request):
         else:
             messages.error(request,'Invalid username or password')
 
-    context={}
+    context={
+        'page':page,
+    }
     return render(request,'core/login_register.html',context)
 
 def LogoutPage(request):
     logout(request)
-    return redirect('core:login')
+    return redirect('core:home')
+
+def RegisterPage(request):
+    page='register'
+    form=UserCreationForm()
+    if request.method=='POST':
+        form=UserCreationForm(request.POST)
+        if form.is_valid():
+            user=form.save(commit=False)
+            user.username=user.username.lower()
+            user.save()
+            login(request,user)
+            return redirect('core:home')
+        else:
+            messages.error(request,'an error Occoured during registration')
+    context={
+        'form':form,
+    }
+    return render(request,'core/login_register.html',context)
 
 def home(request):
     q=request.GET.get('q') if request.GET.get('q') else ''
@@ -59,7 +84,7 @@ def room(request,pk):
 
     return render(request, 'core/room.html',context)
 #CRUD
-
+@login_required(login_url='core:login')
 def CreateView(request):
     form=RoomForm()
     if request.method=='POST':
@@ -72,10 +97,13 @@ def CreateView(request):
     }
     return render(request,'core/room_form.html',context)
 
-
+@login_required(login_url='core:login')
 def UpdateView(request,pk):
     room=Room.objects.get(id=pk)
     form=RoomForm(instance=room)
+
+    if request.user != room.host:
+        return HttpResponse('You are not allowed to update this room')
     if request.method=='POST':
         form=RoomForm(request.POST,instance=room)
         if form.is_valid():
@@ -85,9 +113,11 @@ def UpdateView(request,pk):
         'form':form
     }
     return render(request,'core/room_form.html',context)
-
+@login_required(login_url='core:login')
 def DeleteView(request,pk):
     room=Room.objects.get(id=pk)
+    if request.user != room.host:
+        return HttpResponse('You are not allowed to delete this room')
     if request.method=='POST':
         room.delete()
         return redirect('core:home')
