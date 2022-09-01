@@ -78,8 +78,21 @@ def home(request):
 def room(request,pk):
    
     room=Room.objects.get(id=pk)
+    room_message=room.message_set.all().order_by('-created')
+    participants=room.participants.all()
+    if request.method=='POST':
+        message=Message.objects.create(
+            user=request.user,
+            room=room,
+            content=request.POST.get('body')
+        )
+        room.participants.add(request.user)
+        return redirect('core:room',pk=room.id)
     context={
-        'room':room,    
+        'room':room,
+        'room_message':room_message,
+        'participants':participants,
+                   
     }
 
     return render(request, 'core/room.html',context)
@@ -120,6 +133,19 @@ def DeleteView(request,pk):
         return HttpResponse('You are not allowed to delete this room')
     if request.method=='POST':
         room.delete()
+        return redirect('core:home')
+    context={
+        'room':room
+    }
+    return render(request,'core/delete.html',context)
+
+@login_required(login_url='core:login')
+def Deletemessage(request,pk):
+    message=Message.objects.get(id=pk)
+    if request.user != message.host:
+        return HttpResponse('You are not allowed to delete this room')
+    if request.method=='POST':
+        message.delete()
         return redirect('core:home')
     context={
         'room':room

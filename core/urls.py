@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import home,room,CreateView,UpdateView,DeleteView,LoginPage,LogoutPage,RegisterPage
+from .views import home,room,CreateView,UpdateView,DeleteView,LoginPage,LogoutPage,RegisterPage,Deletemessage
 
 app_name='core'
 
@@ -13,4 +13,5 @@ urlpatterns = [
     path('create-room/',CreateView,name='create-room'),
     path('update-room/<int:pk>/',UpdateView,name='update-room'),
     path('delete-room/<int:pk>/',DeleteView,name='delete-room'),
+    path('delete-message/<int:pk>/',Deletemessage,name='delete-message'),
 ]
