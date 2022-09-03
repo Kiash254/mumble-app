@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import TopicPage,home,room,CreateView,UpdateView, UpdateUser,DeleteView,LoginPage,LogoutPage,RegisterPage,Deletemessage,Profile
+from .views import ActivityPage,TopicPage,home,room,CreateView,UpdateView, UpdateUser,DeleteView,LoginPage,LogoutPage,RegisterPage,Deletemessage,Profile
 app_name='core'
 
 urlpatterns = [
@@ -16,4 +16,5 @@ urlpatterns = [
     path('delete-message/<int:pk>/',Deletemessage,name='delete-message'),
     path('update-user/',UpdateUser,name='update-user'),
     path('topics/',TopicPage,name='topics'),
+    path('activity/',ActivityPage,name='activity'),
 ]
